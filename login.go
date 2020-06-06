@@ -16,11 +16,51 @@ package saebr
 
 import (
 	"encoding/json"
+	"html/template"
 	"log"
 	"net/http"
 )
 
 const tokenVerifyURL = "https://oauth2.googleapis.com/tokeninfo?id_token="
+
+var loginPageTmpl = template.Must(template.New("login.html").Parse(`<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Login</title>
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="icon" href="/static/me.png">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" media="screen,projection" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="google-signin-client_id" content="{{.}}">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+</head>
+
+<body>
+    <header class="section light-blue darken-1">
+        <div class="container">
+            <h3 class="white-text">Login</h3>
+        </div>
+    </header>
+    <article class="section">
+        <div class="container">
+            <div class="g-signin2" data-onsuccess="onSignIn"></div>
+            <script>
+                function onSignIn(googleUser) {
+                    document.getElementById('id_token_input').value = googleUser.getAuthResponse().id_token;
+                    document.getElementById('token_form').submit();
+                }
+            </script>
+            <form method="post" id="token_form">
+                <input type="hidden" name="id_token" id="id_token_input">
+            </form>
+        </div>
+    </article>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</body>
+
+</html>`))
 
 type tokenVerification struct {
 	Issuer        string `json:"iss"`
@@ -45,7 +85,7 @@ type tokenVerification struct {
 
 func (s *server) handleLogin(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
-		http.ServeFile(w, r, "login.html")
+		loginPageTmpl.Execute(w, s.site.WebSignInClientID)
 		return
 	}
 	if r.Method != http.MethodPost {

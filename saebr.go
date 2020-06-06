@@ -42,6 +42,23 @@ type server struct {
 	site   *Site
 }
 
+// Run runs saebr.
+//
+// saebr makes the following assumptions:
+//
+// * It's running on Google App Engine, so runs as an unencrypted HTTP
+//   server. (App Engine can provide HTTPS and HTTP/2.)
+// * Serving port is given by the PORT env var, or if empty assumes 8080.
+// * The Cloud Datastore to use will be named the same as the GCP project,
+//   which is provided by the GOOGLE_CLOUD_PROJECT env var.
+// * There is a SITE_KEY env var, which provides the key for the Site
+//   datastore entity to use.
+// * The Site entity contains all the necessary fields filled in with
+//   appropriate data (e.g. Secret contains a suitably random secret,
+//   WebSignInClientID is a valid client ID for Google Signin, etc).
+//
+// TODO: reimplement the above assumptions with functional options instead
+// TODO: create a default Site entity when none is found
 func Run() {
 	ctx := context.Background()
 	dscli, err := datastore.NewClient(ctx, os.Getenv("GOOGLE_CLOUD_PROJECT"))
@@ -56,6 +73,7 @@ func Run() {
 		log.Fatal("Insufficient secret (len < 16)")
 	}
 	site.cookieStore = sessions.NewCookieStore([]byte(site.Secret))
+	// TODO: Go back to having the page template be a file, because source control rocks.
 	site.pageTmpl = template.Must(template.New("page").Parse(site.PageTemplate))
 	svr := &server{
 		client: dscli,
@@ -78,12 +96,6 @@ func Run() {
 
 	r := mux.NewRouter()
 
-	// File handlers for local testing
-	r.Handle("/static/{file}", http.StripPrefix("/static", http.FileServer(http.Dir("./static"))))
-	r.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) { http.ServeFile(w, r, "favicon.ico") })
-	r.HandleFunc("/robots.txt", func(w http.ResponseWriter, r *http.Request) { http.ServeFile(w, r, "robots.txt") })
-
-	// Actual handlers
 	r.Handle("/sitemap.xml", cache.server(svr.fetchSitemap))
 	r.Handle("/rss.xml", cache.server(svr.fetchRSS))
 	r.Handle("/atom.xml", cache.server(svr.fetchAtom))
