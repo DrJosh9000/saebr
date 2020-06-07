@@ -73,8 +73,7 @@ func Run() {
 		log.Fatal("Insufficient secret (len < 16)")
 	}
 	site.cookieStore = sessions.NewCookieStore([]byte(site.Secret))
-	// TODO: Go back to having the page template be a file, because source control rocks.
-	site.pageTmpl = template.Must(template.New("page").Parse(site.PageTemplate))
+	site.pageTmpl = template.Must(template.ParseFiles(site.PageTemplate))
 	svr := &server{
 		client: dscli,
 		site:   site,
