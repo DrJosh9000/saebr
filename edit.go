@@ -202,7 +202,7 @@ func (s *server) handleEditPost(w http.ResponseWriter, r *http.Request) {
 	page.Blog = r.PostFormValue("Blog") == "on"
 	page.Category = r.PostFormValue("Category")
 	page.Tags = tags(r.PostFormValue("Tags"))
-	page.LastModified = time.Now().In(s.options.timeLocation)
+	page.LastModified = time.Now().In(s.site.timeLoc)
 	if page.Created.IsZero() && page.Published {
 		page.Created = page.LastModified
 	}

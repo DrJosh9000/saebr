@@ -37,8 +37,10 @@ type Site struct {
 	FeedDescription   string `datastore:",noindex"`
 	FeedAuthor        string `datastore:",noindex"`
 	FeedCopyright     string `datastore:",noindex"`
+	TimeLocation      string `datastore:",noindex"`
 
 	pageTmpl      *template.Template
 	pageTmplMtime time.Time
 	cookieStore   *sessions.CookieStore
+	timeLoc       *time.Location
 }

@@ -47,7 +47,6 @@ type server struct {
 type options struct {
 	cacheMaxSize int
 	dsProjectID  string
-	timeLocation *time.Location
 }
 
 // Option is the type of each functional option to Run.
@@ -68,12 +67,6 @@ func DatastoreProjectID(projID string) Option {
 	return func(o *options) { o.dsProjectID = projID }
 }
 
-// TimeLocation sets the timezone (used for saving last-modified time of a
-// post). The default is whatever time.Local is.
-func TimeLocation(tz *time.Location) Option {
-	return func(o *options) { o.timeLocation = tz }
-}
-
 // Run runs saebr.
 //
 // saebr makes the following assumptions:
@@ -87,7 +80,6 @@ func Run(siteKey string, opts ...Option) {
 
 	o := &options{
 		cacheMaxSize: 10000,
-		timeLocation: time.Local,
 	}
 	for _, opt := range opts {
 		opt(o)
@@ -115,6 +107,7 @@ func Run(siteKey string, opts ...Option) {
 		site.FeedSubtitle = "Subtitle for feeds"
 		site.FeedTitle = "Title for feeds"
 		site.PageTemplate = "your_page_template.html"
+		site.TimeLocation = time.Local.String()
 		site.URLBase = "https://your.site.example.com/"
 		site.WebSignInClientID = "a web sign-in client ID - typically a number, then some base64 encoded data, followed by .apps.googleusercontent.com"
 		if _, err := dscli.Put(ctx, site.Key, site); err != nil {
@@ -124,6 +117,11 @@ func Run(siteKey string, opts ...Option) {
 	if len(site.Secret) < 16 {
 		log.Fatal("Insufficient secret (len < 16)")
 	}
+	loc, err := time.LoadLocation(site.TimeLocation)
+	if err != nil {
+		log.Fatalf("Couldn't load time location: %v", err)
+	}
+	site.timeLoc = loc
 	fi, err := os.Stat(site.PageTemplate)
 	if err != nil {
 		log.Fatalf("Couldn't find page template: %v", err)
