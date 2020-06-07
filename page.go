@@ -97,7 +97,7 @@ func (sp sitePage) Render(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(sp.page.fullHTML))
 		return
 	}
-	http.ServeContent(w, r, "f.html", maxTime(sp.page.LastModified, sp.site.LastModified), strings.NewReader(sp.page.fullHTML))
+	http.ServeContent(w, r, "f.html", maxTime(sp.page.LastModified, sp.site.pageTmplMtime), strings.NewReader(sp.page.fullHTML))
 }
 
 func (s *server) fetchPage(ctx context.Context, vars map[string]string) (content, error) {

@@ -72,6 +72,11 @@ func Run() {
 	if len(site.Secret) < 16 {
 		log.Fatal("Insufficient secret (len < 16)")
 	}
+	fi, err := os.Stat(site.PageTemplate)
+	if err != nil {
+		log.Fatalf("Couldn't find page template: %v", err)
+	}
+	site.pageTmplMtime = fi.ModTime()
 	site.cookieStore = sessions.NewCookieStore([]byte(site.Secret))
 	site.pageTmpl = template.Must(template.ParseFiles(site.PageTemplate))
 	svr := &server{

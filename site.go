@@ -27,18 +27,18 @@ import (
 type Site struct {
 	Key *datastore.Key `datastore:"__key__"`
 
-	URLBase           string    `datastore:",noindex"`
-	PageTemplate      string    `datastore:",noindex"`
-	LastModified      time.Time `datastore:",noindex"`
-	AdminEmail        string    `datastore:",noindex"`
-	Secret            string    `datastore:",noindex"`
-	WebSignInClientID string    `datastore:",noindex"`
-	FeedTitle         string    `datastore:",noindex"`
-	FeedSubtitle      string    `datastore:",noindex"`
-	FeedDescription   string    `datastore:",noindex"`
-	FeedAuthor        string    `datastore:",noindex"`
-	FeedCopyright     string    `datastore:",noindex"`
+	URLBase           string `datastore:",noindex"`
+	PageTemplate      string `datastore:",noindex"`
+	AdminEmail        string `datastore:",noindex"`
+	Secret            string `datastore:",noindex"`
+	WebSignInClientID string `datastore:",noindex"`
+	FeedTitle         string `datastore:",noindex"`
+	FeedSubtitle      string `datastore:",noindex"`
+	FeedDescription   string `datastore:",noindex"`
+	FeedAuthor        string `datastore:",noindex"`
+	FeedCopyright     string `datastore:",noindex"`
 
-	pageTmpl    *template.Template
-	cookieStore *sessions.CookieStore
+	pageTmpl      *template.Template
+	pageTmplMtime time.Time
+	cookieStore   *sessions.CookieStore
 }
