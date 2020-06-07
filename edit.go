@@ -30,96 +30,85 @@ import (
 	"github.com/gorilla/mux"
 )
 
-var (
-	editTmpl = template.Must(template.New("edit.html").Parse(`<!DOCTYPE html>
-	<html>
-	
-	<head>
-		<title>Edit</title>
-		<link rel="shortcut icon" href="/favicon.ico">
-		<link rel="icon" href="/static/me.png">
-		<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-		<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" media="screen,projection" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<style>
-		textarea.code {
-			font-family: 'Victor Mono', 'Overpass Mono', 'Fira Code', monospace
-		}
-		</style>
-	</head>
-	
-	<body>
-		<header class="section light-blue darken-1">
-			<div class="container">
-				<h3 class="white-text">Edit</h3>
-			</div>
-		</header>
-		<article class="section">
-			<div class="container">
-				<div class="row">
-					<form method="POST" id="editform" class="col s12">
-						<input type="hidden" name="XSRFToken" value="{{.XSRFToken}}">
-					{{with .Page}}
-						<div class="input-field col s12">
-							<input type="text" name="Key"{{if .Key}} disabled value="{{.Key.Name}}"{{end}}>
-							<label for="Key"{{if .Key}} class="active"{{end}}>Key</label>
-						</div>
-						<div class="input-field col s12">
-							<input type="text" name="Title" value="{{.Title}}">
-							<label for="Title"{{if .Title}} class="active"{{end}}>Title</label>
-						</div>
-						<div class="col l3 m6 s12">
-							<label>
-								<input type="checkbox" class="filled-in" name="Published"{{if .Published}} checked="checked"{{end}}>
-								<span>Published</span>
-							</label>
-						</div>
-						<div class="col l3 m6 s12">
-							<label>
-								<input type="checkbox" class="filled-in" name="Blog"{{if .Blog}} checked="checked"{{end}}>
-								<span>Blog</span>
-							</label>
-						</div>
-						<div class="input-field col s12">
-							<input type="text" name="Category" value="{{.Category}}">
-							<label for="Category"{{if .Category}} class="active"{{end}}>Category</label>
-						</div>
-						<div class="input-field col s12">
-							<input type="text" name="Tags" value="{{.TagList}}">
-							<label for="Tags"{{if .Tags}} class="active"{{end}}>Tags</label>
-							<span class="helper-text">Comma-separated tag list</span>
-						</div>
-						<div class="input-field col s12">
-							<textarea class="materialize-textarea code" name="Contents">{{.Contents}}</textarea>
-							<label for="Content"{{if .Contents}} class="active"{{end}}>Contents</label>
-						</div>
-						<div class="col s12">
-							{{if .Key}}<a class="btn waves-effect waves-light" href="/preview/{{.Key.Name}}">Preview
-								<i class="material-icons right">pageview</i>
-							</a>{{end}}
-							<button class="btn waves-effect waves-light" type="submit" name="action">Save
-								<i class="material-icons right">save</i>
-							</button>
-						</div>
-					{{end}}
-					</form>
-				</div>
-			</div>
-		</article>
-		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-	</body>
-	
-	</html>`))
+var editTmpl = template.Must(template.New("edit.html").Parse(`<!DOCTYPE html>
+<html>
 
-	// TODO: generalise to other time zones.
-	sydney = func() *time.Location {
-		loc, err := time.LoadLocation("Australia/Sydney")
-		if err != nil {
-			panic(err)
-		}
-		return loc
-	}()
-)
+<head>
+	<title>Edit</title>
+	<link rel="shortcut icon" href="/favicon.ico">
+	<link rel="icon" href="/static/me.png">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" media="screen,projection" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<style>
+	textarea.code {
+		font-family: 'Victor Mono', 'Overpass Mono', 'Fira Code', monospace
+	}
+	</style>
+</head>
+
+<body>
+	<header class="section light-blue darken-1">
+		<div class="container">
+			<h3 class="white-text">Edit</h3>
+		</div>
+	</header>
+	<article class="section">
+		<div class="container">
+			<div class="row">
+				<form method="POST" id="editform" class="col s12">
+					<input type="hidden" name="XSRFToken" value="{{.XSRFToken}}">
+				{{with .Page}}
+					<div class="input-field col s12">
+						<input type="text" name="Key"{{if .Key}} disabled value="{{.Key.Name}}"{{end}}>
+						<label for="Key"{{if .Key}} class="active"{{end}}>Key</label>
+					</div>
+					<div class="input-field col s12">
+						<input type="text" name="Title" value="{{.Title}}">
+						<label for="Title"{{if .Title}} class="active"{{end}}>Title</label>
+					</div>
+					<div class="col l3 m6 s12">
+						<label>
+							<input type="checkbox" class="filled-in" name="Published"{{if .Published}} checked="checked"{{end}}>
+							<span>Published</span>
+						</label>
+					</div>
+					<div class="col l3 m6 s12">
+						<label>
+							<input type="checkbox" class="filled-in" name="Blog"{{if .Blog}} checked="checked"{{end}}>
+							<span>Blog</span>
+						</label>
+					</div>
+					<div class="input-field col s12">
+						<input type="text" name="Category" value="{{.Category}}">
+						<label for="Category"{{if .Category}} class="active"{{end}}>Category</label>
+					</div>
+					<div class="input-field col s12">
+						<input type="text" name="Tags" value="{{.TagList}}">
+						<label for="Tags"{{if .Tags}} class="active"{{end}}>Tags</label>
+						<span class="helper-text">Comma-separated tag list</span>
+					</div>
+					<div class="input-field col s12">
+						<textarea class="materialize-textarea code" name="Contents">{{.Contents}}</textarea>
+						<label for="Content"{{if .Contents}} class="active"{{end}}>Contents</label>
+					</div>
+					<div class="col s12">
+						{{if .Key}}<a class="btn waves-effect waves-light" href="/preview/{{.Key.Name}}">Preview
+							<i class="material-icons right">pageview</i>
+						</a>{{end}}
+						<button class="btn waves-effect waves-light" type="submit" name="action">Save
+							<i class="material-icons right">save</i>
+						</button>
+					</div>
+				{{end}}
+				</form>
+			</div>
+		</div>
+	</article>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</body>
+	
+</html>`))
 
 type userIDCtxKey struct{}
 
@@ -213,7 +202,7 @@ func (s *server) handleEditPost(w http.ResponseWriter, r *http.Request) {
 	page.Blog = r.PostFormValue("Blog") == "on"
 	page.Category = r.PostFormValue("Category")
 	page.Tags = tags(r.PostFormValue("Tags"))
-	page.LastModified = time.Now().In(sydney)
+	page.LastModified = time.Now().In(s.options.timeLocation)
 	if page.Created.IsZero() && page.Published {
 		page.Created = page.LastModified
 	}

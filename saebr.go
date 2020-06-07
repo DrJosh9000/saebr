@@ -17,6 +17,7 @@ package saebr // import "github.com/DrJosh9000/saebr"
 
 import (
 	"context"
+	"crypto/rand"
 	"html/template"
 	"log"
 	"net/http"
@@ -38,8 +39,39 @@ func maxTime(a, b time.Time) time.Time {
 }
 
 type server struct {
-	client *datastore.Client
-	site   *Site
+	client  *datastore.Client
+	site    *Site
+	options *options
+}
+
+type options struct {
+	cacheMaxSize int
+	dsProjectID  string
+	timeLocation *time.Location
+}
+
+// Option is the type of each functional option to Run.
+type Option func(*options)
+
+// TODO: provide an option for disabling the cache.
+
+// CacheMaxSize configures the maximum size for the page cache. The default is
+// 10000.
+func CacheMaxSize(n int) Option {
+	return func(o *options) { o.cacheMaxSize = n }
+}
+
+// DatastoreProjectID sets the project ID used for the Cloud Datastore client.
+// The default is the empty string (the client then obtains the project ID from
+// the DATASTORE_PROJECT_ID env var).
+func DatastoreProjectID(projID string) Option {
+	return func(o *options) { o.dsProjectID = projID }
+}
+
+// TimeLocation sets the timezone (used for saving last-modified time of a
+// post). The default is whatever time.Local is.
+func TimeLocation(tz *time.Location) Option {
+	return func(o *options) { o.timeLocation = tz }
 }
 
 // Run runs saebr.
@@ -48,26 +80,46 @@ type server struct {
 //
 // * It's running on Google App Engine, so runs as an unencrypted HTTP
 //   server. (App Engine can provide HTTPS and HTTP/2.)
+// * Run can exit the program (using log.Fatal) if an error occurs.
 // * Serving port is given by the PORT env var, or if empty assumes 8080.
-// * The Cloud Datastore to use will be named the same as the GCP project,
-//   which is provided by the GOOGLE_CLOUD_PROJECT env var.
-// * There is a SITE_KEY env var, which provides the key for the Site
-//   datastore entity to use.
-// * The Site entity contains all the necessary fields filled in with
-//   appropriate data (e.g. Secret contains a suitably random secret,
-//   WebSignInClientID is a valid client ID for Google Signin, etc).
-//
-// TODO: reimplement the above assumptions with functional options instead
-// TODO: create a default Site entity when none is found
-func Run() {
+func Run(siteKey string, opts ...Option) {
 	ctx := context.Background()
-	dscli, err := datastore.NewClient(ctx, os.Getenv("GOOGLE_CLOUD_PROJECT"))
+
+	o := &options{
+		cacheMaxSize: 10000,
+		timeLocation: time.Local,
+	}
+	for _, opt := range opts {
+		opt(o)
+	}
+
+	dscli, err := datastore.NewClient(ctx, o.dsProjectID)
 	if err != nil {
 		log.Fatalf("Couldn't create datastore client: %v", err)
 	}
-	site := &Site{Key: datastore.NameKey("Site", os.Getenv("SITE_KEY"), nil)}
+	site := &Site{Key: datastore.NameKey("Site", siteKey, nil)}
 	if err := dscli.Get(ctx, site.Key, site); err != nil {
-		log.Fatalf("Couldn't fetch site object: %v", err)
+		if err != datastore.ErrNoSuchEntity {
+			log.Fatalf("Couldn't fetch site object: %v", err)
+		}
+		// Fill in some sensible defaults and create it
+		secret := make([]byte, 32)
+		if _, err := rand.Read(secret); err != nil {
+			log.Fatalf("Couldn't generate a secret: %v", err)
+		}
+		site.Secret = string(secret)
+		site.AdminEmail = "your.google.account.email.address@example.com"
+		site.FeedAuthor = "Your Name"
+		site.FeedCopyright = "Copyright © Your Name"
+		site.FeedDescription = "Description for feeds"
+		site.FeedSubtitle = "Subtitle for feeds"
+		site.FeedTitle = "Title for feeds"
+		site.PageTemplate = "your_page_template.html"
+		site.URLBase = "https://your.site.example.com/"
+		site.WebSignInClientID = "a web sign-in client ID - typically a number, then some base64 encoded data, followed by .apps.googleusercontent.com"
+		if _, err := dscli.Put(ctx, site.Key, site); err != nil {
+			log.Fatalf("Couldn't create a new Site entity: %v", err)
+		}
 	}
 	if len(site.Secret) < 16 {
 		log.Fatal("Insufficient secret (len < 16)")
@@ -80,11 +132,12 @@ func Run() {
 	site.cookieStore = sessions.NewCookieStore([]byte(site.Secret))
 	site.pageTmpl = template.Must(template.ParseFiles(site.PageTemplate))
 	svr := &server{
-		client: dscli,
-		site:   site,
+		client:  dscli,
+		site:    site,
+		options: o,
 	}
 	cache := &cache{
-		limit: 10000,
+		limit: o.cacheMaxSize,
 		cache: make(map[string]cacheEntry),
 		notFound: sitePage{
 			site: site,
