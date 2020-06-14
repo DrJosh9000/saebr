@@ -18,6 +18,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 
@@ -74,9 +75,24 @@ type cacheServer struct {
 	fetcher fetcherFunc
 }
 
+var skipSuffixes = []string{
+	"/wp-login.php",
+	"/wlwmanifest.xml",
+	"/xmlrpc.php",
+}
+
+func shouldSkip(path string) bool {
+	for _, suf := range skipSuffixes {
+		if strings.HasSuffix(path, suf) {
+			return true
+		}
+	}
+	return false
+}
+
 func (c *cacheServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if shouldTarpit(r.URL.Path) {
-		tarpit(w)
+	if shouldSkip(r.URL.Path) {
+		http.Error(w, "get nicked", http.StatusTeapot)
 		return
 	}
 
