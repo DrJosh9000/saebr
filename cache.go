@@ -75,6 +75,11 @@ type cacheServer struct {
 }
 
 func (c *cacheServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if shouldTarpit(r.URL.Path) {
+		tarpit(w)
+		return
+	}
+
 	ctx, canc := context.WithTimeout(r.Context(), 10*time.Second)
 	defer canc()
 
