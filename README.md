@@ -4,4 +4,4 @@ The engine underlying my blog. Could be used as a CMS? Maybe!
 
 ## Usage
 
-Coming soon!
+Use [the template](https://github.com/DrJosh9000/saebr-instance), Luke.
