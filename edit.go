@@ -36,15 +36,9 @@ var editTmpl = template.Must(template.New("edit.html").Parse(`<!DOCTYPE html>
 <head>
 	<title>Edit</title>
 	<link rel="shortcut icon" href="/favicon.ico">
-	<link rel="icon" href="/static/me.png">
 	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" media="screen,projection" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<style>
-	textarea.code {
-		font-family: 'Victor Mono', 'Overpass Mono', 'Fira Code', monospace
-	}
-	</style>
 </head>
 
 <body>
@@ -89,7 +83,7 @@ var editTmpl = template.Must(template.New("edit.html").Parse(`<!DOCTYPE html>
 						<span class="helper-text">Comma-separated tag list</span>
 					</div>
 					<div class="input-field col s12">
-						<textarea class="materialize-textarea code" name="Contents">{{.Contents}}</textarea>
+						<textarea name="Contents" id="editor">{{.Contents}}</textarea>
 						<label for="Content"{{if .Contents}} class="active"{{end}}>Contents</label>
 					</div>
 					<div class="col s12">
@@ -106,6 +100,12 @@ var editTmpl = template.Must(template.New("edit.html").Parse(`<!DOCTYPE html>
 		</div>
 	</article>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.min.js" charset="utf-8"></script>
+	<script>
+		var editor = ace.edit("editor");
+		editor.setTheme("ace/theme/monokai");
+		editor.session.setMode("ace/mode/markdown");
+	</script>
 </body>
 	
 </html>`))
