@@ -18,6 +18,7 @@ package saebr // import "github.com/DrJosh9000/saebr"
 import (
 	"context"
 	"crypto/rand"
+	"encoding/base64"
 	"html/template"
 	"log"
 	"net/http"
@@ -99,7 +100,7 @@ func Run(siteKey string, opts ...Option) {
 		if _, err := rand.Read(secret); err != nil {
 			log.Fatalf("Couldn't generate a secret: %v", err)
 		}
-		site.Secret = string(secret)
+		site.Secret = base64.StdEncoding.EncodeToString(secret)
 		site.AdminEmail = "your.google.account.email.address@example.com"
 		site.FeedAuthor = "Your Name"
 		site.FeedCopyright = "Copyright © Your Name"
