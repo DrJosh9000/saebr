@@ -46,8 +46,9 @@ type server struct {
 }
 
 type options struct {
-	cacheMaxSize int
-	dsProjectID  string
+	cacheMaxSize  int
+	dsProjectID   string
+	templateFuncs template.FuncMap
 }
 
 // Option is the type of each functional option to Run.
@@ -68,6 +69,16 @@ func DatastoreProjectID(projID string) Option {
 	return func(o *options) { o.dsProjectID = projID }
 }
 
+// TemplateFuncs allows providing custom template functions. Can be passed
+// multiple times.
+func TemplateFuncs(fm template.FuncMap) Option {
+	return func(o *options) {
+		for k, f := range fm {
+			o.templateFuncs[k] = f
+		}
+	}
+}
+
 // Run runs saebr.
 //
 // saebr makes the following assumptions:
@@ -80,7 +91,8 @@ func Run(siteKey string, opts ...Option) {
 	ctx := context.Background()
 
 	o := &options{
-		cacheMaxSize: 10000,
+		cacheMaxSize:  10000,
+		templateFuncs: make(template.FuncMap),
 	}
 	for _, opt := range opts {
 		opt(o)
@@ -129,7 +141,7 @@ func Run(siteKey string, opts ...Option) {
 	}
 	site.pageTmplMtime = fi.ModTime()
 	site.cookieStore = sessions.NewCookieStore([]byte(site.Secret))
-	site.pageTmpl = template.Must(template.ParseFiles(site.PageTemplate))
+	site.pageTmpl = template.Must(template.New("page").Funcs(o.templateFuncs).Parse(site.PageTemplate))
 	svr := &server{
 		client:  dscli,
 		site:    site,
