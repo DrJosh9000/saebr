@@ -106,6 +106,8 @@ var editTmpl = template.Must(template.New("edit.html").Parse(`<!DOCTYPE html>
 		const editor = ace.edit("editor", {
 			mode: "ace/mode/markdown",
 			theme: "ace/theme/monokai",
+			minLines: 10,
+			maxLines: 40
 		});
 
 		const contents = document.getElementById("contents");
