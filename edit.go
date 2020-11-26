@@ -84,7 +84,7 @@ var editTmpl = template.Must(template.New("edit.html").Parse(`<!DOCTYPE html>
 					</div>
 					<div class="input-field col s12">
 						<div id="editor"></div>
-						<input type="hidden" id="contents" name="Contents">
+						<input type="hidden" id="contents" name="Contents" value="{{.Contents}}">
 					</div>
 					<div class="col s12">
 						{{if .Key}}<a class="btn waves-effect waves-light" href="/preview/{{.Key.Name}}">Preview
