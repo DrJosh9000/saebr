@@ -141,7 +141,7 @@ func Run(siteKey string, opts ...Option) {
 	}
 	site.pageTmplMtime = fi.ModTime()
 	site.cookieStore = sessions.NewCookieStore([]byte(site.Secret))
-	site.pageTmpl = template.Must(template.New("page").Funcs(o.templateFuncs).Parse(site.PageTemplate))
+	site.pageTmpl = template.Must(template.New("page").Funcs(o.templateFuncs).ParseFiles(site.PageTemplate))
 	svr := &server{
 		client:  dscli,
 		site:    site,
