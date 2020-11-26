@@ -53,14 +53,14 @@ func (s *server) relink(ctx context.Context) error {
 			upd[N-1] = struct{}{}
 		}
 		// Then set prev/next for the middle
-		for i := range pages[1:] {
-			if k := pages[i-1].Key; !pages[i].Prev.Equal(k) {
-				pages[i].Prev = k
-				upd[i] = struct{}{}
+		for i := range pages[:N-1] {
+			if k := pages[i].Key; !pages[i+1].Prev.Equal(k) {
+				pages[i+1].Prev = k
+				upd[i+1] = struct{}{}
 			}
-			if k := pages[i].Key; !pages[i-1].Next.Equal(k) {
-				pages[i-1].Next = k
-				upd[i-1] = struct{}{}
+			if k := pages[i+1].Key; !pages[i].Next.Equal(k) {
+				pages[i].Next = k
+				upd[i] = struct{}{}
 			}
 		}
 		// Put all changed pages.
