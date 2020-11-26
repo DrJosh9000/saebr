@@ -218,10 +218,12 @@ func (s *server) handleEditPost(w http.ResponseWriter, r *http.Request) {
 
 	if _, err := s.client.Put(ctx, key, page); err != nil {
 		http.Error(w, "couldn't save entity", http.StatusInternalServerError)
+		log.Printf("Couldn't put: %v", err)
 		return
 	}
 	if err := s.relink(ctx); err != nil {
 		http.Error(w, "couldn't relink", http.StatusInternalServerError)
+		log.Printf("Couldn't relink: %v", err)
 		return
 	}
 	if pkey != nkey {
