@@ -23,6 +23,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path"
 	"time"
 
 	"cloud.google.com/go/datastore"
@@ -141,7 +142,7 @@ func Run(siteKey string, opts ...Option) {
 	}
 	site.pageTmplMtime = fi.ModTime()
 	site.cookieStore = sessions.NewCookieStore([]byte(site.Secret))
-	site.pageTmpl = template.Must(template.New("page").Funcs(o.templateFuncs).ParseFiles(site.PageTemplate))
+	site.pageTmpl = template.Must(template.New(path.Base(site.PageTemplate)).Funcs(o.templateFuncs).ParseFiles(site.PageTemplate))
 	svr := &server{
 		client:  dscli,
 		site:    site,
