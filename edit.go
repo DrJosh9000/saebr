@@ -83,8 +83,8 @@ var editTmpl = template.Must(template.New("edit.html").Parse(`<!DOCTYPE html>
 						<span class="helper-text">Comma-separated tag list</span>
 					</div>
 					<div class="input-field col s12">
-						<textarea name="Contents" id="editor">{{.Contents}}</textarea>
-						<label for="Content"{{if .Contents}} class="active"{{end}}>Contents</label>
+						<div id="editor"></div>
+						<input type="hidden" id="contents" name="Contents">
 					</div>
 					<div class="col s12">
 						{{if .Key}}<a class="btn waves-effect waves-light" href="/preview/{{.Key.Name}}">Preview
@@ -102,9 +102,16 @@ var editTmpl = template.Must(template.New("edit.html").Parse(`<!DOCTYPE html>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.min.js" charset="utf-8"></script>
 	<script>
-		var editor = ace.edit("editor");
-		editor.setTheme("ace/theme/monokai");
-		editor.session.setMode("ace/mode/markdown");
+		ace.config.set("basePath", "https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/");
+		const editor = ace.edit("editor", {
+			mode: "ace/mode/markdown",
+			theme: "ace/theme/monokai",
+		});
+
+		const contents = document.getElementById("contents");
+		editor.session.setValue(contents.value); 
+		const form = document.getElementById("editform");
+		form.addEventListener("submit", () => { contents.value = editor.session.getValue() });
 	</script>
 </body>
 	
