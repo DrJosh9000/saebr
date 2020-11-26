@@ -220,6 +220,10 @@ func (s *server) handleEditPost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "couldn't save entity", http.StatusInternalServerError)
 		return
 	}
+	if err := s.relink(ctx); err != nil {
+		http.Error(w, "couldn't relink", http.StatusInternalServerError)
+		return
+	}
 	if pkey != nkey {
 		http.Redirect(w, r, "/edit/"+nkey, http.StatusFound)
 		return

@@ -45,9 +45,9 @@ type Page struct {
 	Blog         bool
 	Category     string
 	Tags         []string
-	Contents     string `datastore:",noindex"`
+	Contents     string         `datastore:",noindex"`
+	Prev, Next   *datastore.Key `datastore:",noindex"`
 
-	Latest   bool      `datastore:"-"` // Set by fetchLatest
 	fullHTML string    `datastore:"-"` // Set by Render
 	render   sync.Once `datastore:"-"`
 }
@@ -56,6 +56,11 @@ type Page struct {
 // by more than 12 hours.
 func (p *Page) Edited() bool {
 	return p.LastModified.Sub(p.Created) > 12*time.Hour
+}
+
+// Latest reports if the page is the latest (i.e. Next is nil).
+func (p *Page) Latest() bool {
+	return p.Next == nil
 }
 
 // TagList returns Tags as a single comma-delimited string.

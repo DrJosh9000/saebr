@@ -37,7 +37,6 @@ func (s *server) fetchLatest(ctx context.Context, _ map[string]string) (content,
 	if len(pages) == 0 {
 		return nil, errors.New("no pages returned")
 	}
-	pages[0].Latest = true
 	return sitePage{
 		site: s.site,
 		page: pages[0],
