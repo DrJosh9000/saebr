@@ -105,9 +105,10 @@ var editTmpl = template.Must(template.New("edit.html").Parse(`<!DOCTYPE html>
 		ace.config.set("basePath", "https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/");
 		const editor = ace.edit("editor", {
 			mode: "ace/mode/markdown",
-			theme: "ace/theme/monokai",
+			theme: "ace/theme/chrome",
 			minLines: 10,
-			maxLines: 40
+			maxLines: 40,
+			wrap: true
 		});
 
 		const contents = document.getElementById("contents");
