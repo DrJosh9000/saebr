@@ -26,7 +26,6 @@ import (
 	"time"
 
 	"cloud.google.com/go/datastore"
-	"github.com/russross/blackfriday/v2"
 )
 
 var notFoundPage = &Page{
@@ -68,10 +67,11 @@ func (p *Page) TagList() string {
 	return strings.Join(p.Tags, ", ")
 }
 
-// ContentsHTML translates the Contents (markdown) into HTML and returns it.
+// ContentsHTML translates the Contents from Markdown into HTML, and returns it.
+// (You don't have to store Markdown in the Contents field, and you don't have
+// to use this method in your template.)
 func (p *Page) ContentsHTML() template.HTML {
-	return template.HTML(strings.Replace(string(blackfriday.Run([]byte(p.Contents))),
-		"<ul>", `<ul class="browser-default">`, -1)) // Materialize versus <ul>
+	return materializeULTags(blackfridayRun(p.Contents))
 }
 
 type sitePage struct {

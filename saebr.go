@@ -24,11 +24,13 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/datastore"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
+	"github.com/russross/blackfriday/v2"
 )
 
 const cacheTTL = time.Minute
@@ -80,6 +82,16 @@ func TemplateFuncs(fm template.FuncMap) Option {
 	}
 }
 
+// Template funcs
+
+func blackfridayRun(s string) template.HTML {
+	return template.HTML(blackfriday.Run([]byte(s)))
+}
+
+func materializeULTags(s template.HTML) template.HTML {
+	return template.HTML(strings.Replace(string(s), "<ul>", `<ul class="browser-default">`, -1))
+}
+
 // Run runs saebr.
 //
 // saebr makes the following assumptions:
@@ -92,8 +104,12 @@ func Run(siteKey string, opts ...Option) {
 	ctx := context.Background()
 
 	o := &options{
-		cacheMaxSize:  10000,
-		templateFuncs: make(template.FuncMap),
+		cacheMaxSize: 10000,
+		templateFuncs: template.FuncMap{
+			// Built-in template functions
+			"blackfridayRun":    blackfridayRun,
+			"materialiseULTags": materializeULTags,
+		},
 	}
 	for _, opt := range opts {
 		opt(o)
@@ -142,7 +158,11 @@ func Run(siteKey string, opts ...Option) {
 	}
 	site.pageTmplMtime = fi.ModTime()
 	site.cookieStore = sessions.NewCookieStore([]byte(site.Secret))
-	site.pageTmpl = template.Must(template.New(path.Base(site.PageTemplate)).Funcs(o.templateFuncs).ParseFiles(site.PageTemplate))
+	site.pageTmpl = template.Must(
+		template.New(path.Base(site.PageTemplate)).
+			Funcs(o.templateFuncs).
+			ParseFiles(site.PageTemplate),
+	)
 	svr := &server{
 		client:  dscli,
 		site:    site,
