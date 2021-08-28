@@ -57,9 +57,9 @@ func (p *Page) Edited() bool {
 	return p.LastModified.Sub(p.Created) > 12*time.Hour
 }
 
-// Latest reports if the page is the latest (i.e. Next is nil).
+// Latest reports if the page is the latest (i.e. Next is nil) and Blog is true.
 func (p *Page) Latest() bool {
-	return p.Next == nil
+	return p.Next == nil && p.Blog
 }
 
 // TagList returns Tags as a single comma-delimited string.
