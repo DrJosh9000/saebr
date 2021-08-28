@@ -29,7 +29,8 @@ func (s *server) handlePreview(w http.ResponseWriter, r *http.Request) {
 
 	sp, err := s.fetchDraftPage(ctx, mux.Vars(r))
 	if err != nil {
-		log.Printf("not found: %v", err)
+		log.Printf("handlePreview: not found: %v", err)
+		sp = &sitePage{site: s.site, page: notFoundPage}
 	}
 	sp.Render(w, r)
 }
