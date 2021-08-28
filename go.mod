@@ -5,6 +5,8 @@ go 1.15
 require (
 	cloud.google.com/go v0.93.3 // indirect
 	cloud.google.com/go/datastore v1.5.0
+	github.com/Depado/bfchroma v1.3.0 // indirect
+	github.com/alecthomas/chroma v0.9.2 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/google/go-cmp v0.5.6 // indirect
 	github.com/googleapis/gax-go/v2 v2.1.0 // indirect

@@ -28,6 +28,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/datastore"
+	"github.com/Depado/bfchroma"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/russross/blackfriday/v2"
@@ -85,7 +86,12 @@ func TemplateFuncs(fm template.FuncMap) Option {
 // Template funcs
 
 func blackfridayRun(s string) template.HTML {
-	return template.HTML(blackfriday.Run([]byte(s)))
+	return template.HTML(
+		blackfriday.Run(
+			[]byte(s),
+			blackfriday.WithRenderer(bfchroma.NewRenderer()),
+		),
+	)
 }
 
 func materializeULTags(s template.HTML) template.HTML {
