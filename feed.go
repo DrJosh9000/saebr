@@ -63,7 +63,7 @@ func (s *server) fetchFeed(ctx context.Context) (*feeds.Feed, error) {
 			Id:      link,
 			Updated: page.LastModified,
 			Created: page.Created,
-			Content: string(page.ContentsHTML()),
+			Content: string(blackfridayRun(page.Contents)),
 		})
 	}
 	return feed, nil

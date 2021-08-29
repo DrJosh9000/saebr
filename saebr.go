@@ -28,7 +28,6 @@ import (
 	"time"
 
 	"cloud.google.com/go/datastore"
-	"github.com/Depado/bfchroma"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/russross/blackfriday/v2"
@@ -86,12 +85,7 @@ func TemplateFuncs(fm template.FuncMap) Option {
 // Template funcs
 
 func blackfridayRun(s string) template.HTML {
-	return template.HTML(
-		blackfriday.Run(
-			[]byte(s),
-			blackfriday.WithRenderer(bfchroma.NewRenderer()),
-		),
-	)
+	return template.HTML(blackfriday.Run([]byte(s)))
 }
 
 func materializeULTags(s template.HTML) template.HTML {
@@ -112,7 +106,7 @@ func Run(siteKey string, opts ...Option) {
 	o := &options{
 		cacheMaxSize: 10000,
 		templateFuncs: template.FuncMap{
-			// Built-in template functions
+			// Built-in template functions - can be overridden
 			"blackfridayRun":    blackfridayRun,
 			"materialiseULTags": materializeULTags,
 		},

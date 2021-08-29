@@ -17,7 +17,6 @@ package saebr
 import (
 	"context"
 	"fmt"
-	"html/template"
 	"log"
 	"net/http"
 	"strconv"
@@ -65,13 +64,6 @@ func (p *Page) Latest() bool {
 // TagList returns Tags as a single comma-delimited string.
 func (p *Page) TagList() string {
 	return strings.Join(p.Tags, ", ")
-}
-
-// ContentsHTML translates the Contents from Markdown into HTML, and returns it.
-// (You don't have to store Markdown in the Contents field, and you don't have
-// to use this method in your template.)
-func (p *Page) ContentsHTML() template.HTML {
-	return materializeULTags(blackfridayRun(p.Contents))
 }
 
 type sitePage struct {
