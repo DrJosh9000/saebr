@@ -189,6 +189,7 @@ func Run(siteKey string, opts ...Option) {
 	r.Handle("/rss.xml", cache.server(svr.fetchRSS))
 	r.Handle("/atom.xml", cache.server(svr.fetchAtom))
 	r.Handle("/feed.json", cache.server(svr.fetchJSONFeed))
+	r.Handle("/feed", cache.server(svr.fetchRSS)) // WP style
 	r.Handle("/index", cache.server(svr.fetchIndex))
 	r.HandleFunc("/login", svr.handleLogin)
 
