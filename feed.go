@@ -30,8 +30,7 @@ func (s *server) fetchFeed(ctx context.Context) (*feeds.Feed, error) {
 		Ancestor(s.site.Key).
 		Filter("Published =", true).
 		Filter("Blog =", true).
-		Order("-Created").
-		Limit(10)
+		Order("-Created")
 
 	var pages []*Page
 	if _, err := s.client.GetAll(ctx, q, &pages); err != nil {
