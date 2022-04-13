@@ -186,15 +186,15 @@ func Run(siteKey string, opts ...Option) {
 	r := mux.NewRouter()
 
 	// How to fetch a feed (as seen in <meta>)
-	r.Handle("/rss.xml", cache.server(svr.fetchRSS))
-	r.Handle("/atom.xml", cache.server(svr.fetchAtom))
-	r.Handle("/feed.json", cache.server(svr.fetchJSONFeed))
+	r.Handle("/rss.xml", cache.server(svr.fetchRSS, ""))
+	r.Handle("/atom.xml", cache.server(svr.fetchAtom, ""))
+	r.Handle("/feed.json", cache.server(svr.fetchJSONFeed, ""))
 	// How to fetch a feed 2 - Wordpress Boogaloo
-	r.Handle("/feed", cache.server(svr.fetchRSS))
-	r.Handle("/feed/", cache.server(svr.fetchRSS))
+	r.Handle("/feed", cache.server(svr.fetchRSS, "/rss.xml"))
+	r.Handle("/feed/", cache.server(svr.fetchRSS, "/rss.xml"))
 	// Other easy routes
-	r.Handle("/sitemap.xml", cache.server(svr.fetchSitemap))
-	r.Handle("/index", cache.server(svr.fetchIndex))
+	r.Handle("/sitemap.xml", cache.server(svr.fetchSitemap, ""))
+	r.Handle("/index", cache.server(svr.fetchIndex, ""))
 	r.HandleFunc("/login", svr.handleLogin)
 
 	// Editing
@@ -211,15 +211,15 @@ func Run(siteKey string, opts ...Option) {
 	p.HandleFunc("/{page}", svr.handlePreview)
 
 	// Pages and posts
-	r.Handle("/{page}", cache.server(svr.fetchPage))
+	r.Handle("/{page}", cache.server(svr.fetchPage, ""))
 	
 	// How to fetch a feed 3 - revenge of the query parameters
 	q := r.Path("/").Subrouter()
-	q.Handle("/", cache.server(svr.fetchRSS)).Queries("feed", "rss")
-	q.Handle("/", cache.server(svr.fetchAtom)).Queries("feed", "atom")
+	q.Handle("/", cache.server(svr.fetchRSS, "/rss.xml")).Queries("feed", "rss")
+	q.Handle("/", cache.server(svr.fetchAtom, "/atom.xml")).Queries("feed", "atom")
 	
 	// Latest post
-	q.Handle("/", cache.server(svr.fetchLatest))
+	q.Handle("/", cache.server(svr.fetchLatest, ""))
 
 	log.Printf("Listening on port %s", port)
 	if err := http.ListenAndServe(":"+port, r); err != nil {

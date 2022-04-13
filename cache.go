@@ -63,16 +63,18 @@ func (c *cache) put(page string, ent cacheEntry) {
 
 type fetcherFunc func(context.Context, map[string]string) (content, error)
 
-func (c *cache) server(fetcher fetcherFunc) *cacheServer {
+func (c *cache) server(fetcher fetcherFunc, key string) *cacheServer {
 	return &cacheServer{
 		cache:   c,
 		fetcher: fetcher,
+		key: key,
 	}
 }
 
 type cacheServer struct {
 	cache   *cache
 	fetcher fetcherFunc
+	key string
 }
 
 var skipSuffixes = []string{
@@ -100,10 +102,13 @@ func (c *cacheServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer canc()
 
 	vars := mux.Vars(r)
-	path := r.URL.Path
+	key := c.key
+	if key == "" {
+		key = r.URL.Path
+	}
 
 	// In cache?
-	if ent, found := c.cache.get(path); found {
+	if ent, found := c.cache.get(key); found {
 		// Is it fresh enough to serve?
 		if ent.fetched.Add(cacheTTL).After(time.Now()) {
 			ent.content.Render(w, r)
@@ -113,12 +118,12 @@ func (c *cacheServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	cont, err := c.fetcher(ctx, vars)
 	if err != nil {
-		log.Printf("Couldn't fetch content for %q: %v", path, err)
+		log.Printf("Couldn't fetch content for %q: %v", key, err)
 	}
 	if cont == nil {
 		cont = c.cache.notFound
 	}
-	c.cache.put(path, cacheEntry{
+	c.cache.put(key, cacheEntry{
 		fetched: time.Now(),
 		content: cont,
 	})
