@@ -17,6 +17,7 @@ package saebr
 import (
 	"context"
 	"errors"
+	"net/http"
 
 	"cloud.google.com/go/datastore"
 )
@@ -41,4 +42,15 @@ func (s *server) fetchLatest(ctx context.Context, _ map[string]string) (content,
 		site: s.site,
 		page: pages[0],
 	}, nil
+}
+
+// Redirects to the latest blog post.
+func (s *server) redirectToLatest(w http.ResponseWriter, r *http.Request) {
+	latest, err := s.fetchLatest(r.Context(), nil)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+	sp := latest.(sitePage)
+	http.Redirect(w, r, "/"+sp.page.Key.Name, http.StatusFound)
 }

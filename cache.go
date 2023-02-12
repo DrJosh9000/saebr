@@ -67,14 +67,14 @@ func (c *cache) server(fetcher fetcherFunc, key string) *cacheServer {
 	return &cacheServer{
 		cache:   c,
 		fetcher: fetcher,
-		key: key,
+		key:     key,
 	}
 }
 
 type cacheServer struct {
 	cache   *cache
 	fetcher fetcherFunc
-	key string
+	key     string
 }
 
 var skipSuffixes = []string{

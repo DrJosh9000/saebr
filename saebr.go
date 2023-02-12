@@ -96,10 +96,10 @@ func materializeULTags(s template.HTML) template.HTML {
 //
 // saebr makes the following assumptions:
 //
-// * It's running on Google App Engine, so runs as an unencrypted HTTP
-//   server. (App Engine can provide HTTPS and HTTP/2.)
-// * Run can exit the program (using log.Fatal) if an error occurs.
-// * Serving port is given by the PORT env var, or if empty assumes 8080.
+//   - It's running on Google App Engine, so runs as an unencrypted HTTP
+//     server. (App Engine can provide HTTPS and HTTP/2.)
+//   - Run can exit the program (using log.Fatal) if an error occurs.
+//   - Serving port is given by the PORT env var, or if empty assumes 8080.
 func Run(siteKey string, opts ...Option) {
 	ctx := context.Background()
 
@@ -212,14 +212,15 @@ func Run(siteKey string, opts ...Option) {
 
 	// Pages and posts
 	r.Handle("/{page}", cache.server(svr.fetchPage, ""))
-	
+
 	// How to fetch a feed 3 - revenge of the query parameters
 	q := r.Path("/").Subrouter()
 	q.Handle("/", cache.server(svr.fetchRSS, "/rss.xml")).Queries("feed", "rss")
 	q.Handle("/", cache.server(svr.fetchAtom, "/atom.xml")).Queries("feed", "atom")
-	
-	// Latest post
-	q.Handle("/", cache.server(svr.fetchLatest, ""))
+
+	// Redirect root to latest post
+	q.HandleFunc("/", svr.redirectToLatest)
+	// To serve it: q.Handle("/", cache.server(svr.fetchLatest, ""))
 
 	log.Printf("Listening on port %s", port)
 	if err := http.ListenAndServe(":"+port, r); err != nil {
