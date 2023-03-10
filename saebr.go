@@ -227,8 +227,8 @@ func Run(siteKey string, opts ...Option) {
 	p.HandleFunc("/{page}", svr.handlePreview)
 
 	// Pages and posts
-	r.Handle("/{page}", cache.server(svr.fetchPage, ""))
 	r.HandleFunc("/latest", svr.redirectToLatest)
+	r.Handle("/{page}", cache.server(svr.fetchPage, ""))
 
 	// How to fetch a feed 3 - revenge of the query parameters
 	q := r.Path("/").Subrouter()
