@@ -51,8 +51,19 @@ type server struct {
 type options struct {
 	cacheMaxSize  int
 	dsProjectID   string
+	rootAction    ServeAction
 	templateFuncs template.FuncMap
 }
+
+// ServeAction describes some possible actions for handling a request.
+type ServeAction int
+
+// Values for ServeAction.
+const (
+	RedirectToLatest ServeAction = iota // Redirect to latest post canonical
+	ServeLatest                         // Serve a copy of the latest post
+	ServeNormal                         // Serve as a normal page (key "")
+)
 
 // Option is the type of each functional option to Run.
 type Option func(*options)
@@ -70,6 +81,11 @@ func CacheMaxSize(n int) Option {
 // the DATASTORE_PROJECT_ID env var).
 func DatastoreProjectID(projID string) Option {
 	return func(o *options) { o.dsProjectID = projID }
+}
+
+// RootServeAction changes how the root of the site is handled.
+func RootServeAction(sa ServeAction) Option {
+	return func(o *options) { o.rootAction = sa }
 }
 
 // TemplateFuncs allows providing custom template functions. Can be passed
@@ -212,15 +228,23 @@ func Run(siteKey string, opts ...Option) {
 
 	// Pages and posts
 	r.Handle("/{page}", cache.server(svr.fetchPage, ""))
+	r.HandleFunc("/latest", svr.redirectToLatest)
 
 	// How to fetch a feed 3 - revenge of the query parameters
 	q := r.Path("/").Subrouter()
 	q.Handle("/", cache.server(svr.fetchRSS, "/rss.xml")).Queries("feed", "rss")
 	q.Handle("/", cache.server(svr.fetchAtom, "/atom.xml")).Queries("feed", "atom")
 
-	// Redirect root to latest post
-	q.HandleFunc("/", svr.redirectToLatest)
-	// To serve it: q.Handle("/", cache.server(svr.fetchLatest, ""))
+	switch o.rootAction {
+	case RedirectToLatest:
+		q.HandleFunc("/", svr.redirectToLatest)
+
+	case ServeLatest:
+		q.Handle("/", cache.server(svr.fetchLatest, ""))
+
+	case ServeNormal:
+		q.Handle("/", cache.server(svr.fetchPage, ""))
+	}
 
 	log.Printf("Listening on port %s", port)
 	if err := http.ListenAndServe(":"+port, r); err != nil {
