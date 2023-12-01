@@ -97,6 +97,20 @@ func (sp sitePage) Render(w http.ResponseWriter, r *http.Request) {
 	http.ServeContent(w, r, "f.html", maxTime(sp.page.LastModified, sp.site.pageTmplMtime), strings.NewReader(sp.page.fullHTML))
 }
 
+func (s *server) fetchFixed(pageKey string) fetcherFunc {
+	return func(ctx context.Context, _ map[string]string) (content, error) {
+		key := datastore.NameKey("Page", pageKey, s.site.Key)
+		p := new(Page)
+		if err := s.client.Get(ctx, key, p); err != nil {
+			return nil, fmt.Errorf("get %q from Datastore: %v", pageKey, err)
+		}
+		if !p.Published {
+			return nil, fmt.Errorf("%q not published", pageKey)
+		}
+		return sitePage{site: s.site, page: p}, nil
+	}
+}
+
 func (s *server) fetchPage(ctx context.Context, vars map[string]string) (content, error) {
 	page := vars["page"]
 	key := datastore.NameKey("Page", page, s.site.Key)

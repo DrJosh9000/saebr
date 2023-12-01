@@ -245,7 +245,7 @@ func Run(siteKey string, opts ...Option) {
 		q.Handle("/", cache.server(svr.fetchLatest, ""))
 
 	case ServeDefault:
-		q.Handle("/", cache.server(svr.fetchPage, "default"))
+		q.Handle("/", cache.server(svr.fetchFixed("default"), "/default"))
 	}
 
 	log.Printf("Listening on port %s", port)
