@@ -205,9 +205,11 @@ func Run(siteKey string, opts ...Option) {
 	r.Handle("/rss.xml", cache.server(svr.fetchRSS, ""))
 	r.Handle("/atom.xml", cache.server(svr.fetchAtom, ""))
 	r.Handle("/feed.json", cache.server(svr.fetchJSONFeed, ""))
+
 	// How to fetch a feed 2 - Wordpress Boogaloo
 	r.Handle("/feed", cache.server(svr.fetchRSS, "/rss.xml"))
 	r.Handle("/feed/", cache.server(svr.fetchRSS, "/rss.xml"))
+
 	// Other easy routes
 	r.Handle("/sitemap.xml", cache.server(svr.fetchSitemap, ""))
 	r.Handle("/index", cache.server(svr.fetchIndex, ""))
