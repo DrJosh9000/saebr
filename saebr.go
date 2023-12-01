@@ -62,7 +62,7 @@ type ServeAction int
 const (
 	RedirectToLatest ServeAction = iota // Redirect to latest post canonical
 	ServeLatest                         // Serve a copy of the latest post
-	ServeNormal                         // Serve as a normal page (key "")
+	ServeDefault                        // Serve a normal page (key "default")
 )
 
 // Option is the type of each functional option to Run.
@@ -244,8 +244,8 @@ func Run(siteKey string, opts ...Option) {
 	case ServeLatest:
 		q.Handle("/", cache.server(svr.fetchLatest, ""))
 
-	case ServeNormal:
-		q.Handle("/", cache.server(svr.fetchPage, ""))
+	case ServeDefault:
+		q.Handle("/", cache.server(svr.fetchPage, "default"))
 	}
 
 	log.Printf("Listening on port %s", port)
