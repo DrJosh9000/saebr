@@ -29,8 +29,8 @@ var (
 {{range .}}
 #### {{.Header}}
 {{range .Pages}}
-*   [{{.Title}}](/{{.Key.Name}}){{if .Edited}} (edited {{.LastModified.Format "January 2006"}}){{end}}{{end}}
-	{{if .Description}}{{.Description}}{{end}}
+*   [{{.Title}}](/{{.Key.Name}}){{if .Edited}} (edited {{.LastModified.Format "January 2006"}}){{end}}
+	{{if .Description}}{{.Description}}{{end}}{{end}}
 
 {{end}}`))
 )
@@ -92,6 +92,7 @@ func (s *server) fetchIndex(ctx context.Context, _ map[string]string) (content, 
 			Title:        "Index",
 			Published:    true,
 			LastModified: mtime,
+			Description:  "List of all blog posts, in reverse chronological order.",
 			Contents:     b.String(),
 		},
 	}, nil
