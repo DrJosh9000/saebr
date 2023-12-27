@@ -25,8 +25,8 @@ func (s *server) relink(ctx context.Context) error {
 	_, err := s.client.RunInTransaction(ctx, func(tx *datastore.Transaction) error {
 		q := datastore.NewQuery("Page").
 			Ancestor(s.site.Key).
-			Filter("Published =", true).
-			Filter("Blog =", true).
+			FilterField("Published", "=", true).
+			FilterField("Blog", "=", true).
 			Order("Created").
 			Transaction(tx)
 

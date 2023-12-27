@@ -33,7 +33,7 @@ var sitemapTmpl = template.Must(template.New("sitemap.xml").Parse(`<?xml version
 	</url>
 {{- range $.Pages}}
 	<url>
-		<loc>{{$.URLBase}}{{.Key.Name}}</loc>
+		<loc>{{$.URLBase}}{{if ne .Key.Name "default"}}{{.Key.Name}}{{end}}</loc>
 		<lastmod>{{.LastModified.Format "2006-01-02"}}</lastmod>
 	</url>
 {{- end}}
@@ -42,7 +42,7 @@ var sitemapTmpl = template.Must(template.New("sitemap.xml").Parse(`<?xml version
 func (s *server) fetchSitemap(ctx context.Context, _ map[string]string) (content, error) {
 	q := datastore.NewQuery("Page").
 		Ancestor(s.site.Key).
-		Filter("Published =", true).
+		FilterField("Published", "=", true).
 		Project("Created", "LastModified")
 
 	var pages []*Page

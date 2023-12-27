@@ -28,8 +28,8 @@ import (
 func (s *server) fetchFeed(ctx context.Context) (*feeds.Feed, error) {
 	q := datastore.NewQuery("Page").
 		Ancestor(s.site.Key).
-		Filter("Published =", true).
-		Filter("Blog =", true).
+		FilterField("Published", "=", true).
+		FilterField("Blog", "=", true).
 		Order("-Created")
 
 	var pages []*Page
