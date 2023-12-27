@@ -40,8 +40,7 @@ func (s *server) fetchIndex(ctx context.Context, _ map[string]string) (content, 
 		Ancestor(s.site.Key).
 		FilterField("Published", "=", true).
 		FilterField("Blog", "=", true).
-		Order("-Created").
-		Project("Title", "Description", "Created", "LastModified")
+		Order("-Created")
 
 	var pages []*Page
 	if _, err := s.client.GetAll(ctx, q, &pages); err != nil {
