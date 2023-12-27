@@ -29,8 +29,7 @@ var (
 {{range .}}
 #### {{.Header}}
 {{range .Pages}}
-*   [{{.Title}}](/{{.Key.Name}}){{if .Edited}} (edited {{.LastModified.Format "January 2006"}}){{end}}{{if .Description}}
-	{{.Description}}{{end}}{{end}}
+*   [{{.Title}}](/{{.Key.Name}}){{if .Edited}} <small>(edited {{.LastModified.Format "January 2006"}})</small>{{end}}{{if .Description}}<br />{{.Description}}{{end}}{{end}}
 
 {{end}}`))
 )
