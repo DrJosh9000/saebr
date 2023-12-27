@@ -26,11 +26,11 @@ import (
 var (
 	indexTmpl = template.Must(template.New("index.md").Parse(`All blog posts, in reverse chronological order.
 
-{{range .}}
-#### {{.Header}}
+{{range .}}#### {{.Header}}
 {{range .Pages}}
-*   [{{.Title}}](/{{.Key.Name}}){{if .Edited}} <small>(edited {{.LastModified.Format "January 2006"}})</small>{{end}}{{if .Description}}<br />{{.Description}}{{end}}{{end}}
+[{{.Title}}](/{{.Key.Name}}){{if .Edited}} <small>(edited {{.LastModified.Format "January 2006"}})</small>{{end}}{{if .Description}}<br />{{.Description}}{{end}}
 
+{{end}}
 {{end}}`))
 )
 
