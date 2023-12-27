@@ -26,8 +26,8 @@ import (
 func (s *server) fetchLatest(ctx context.Context, _ map[string]string) (content, error) {
 	q := datastore.NewQuery("Page").
 		Ancestor(s.site.Key).
-		Filter("Published =", true).
-		Filter("Blog =", true).
+		FilterField("Published", "=", true).
+		FilterField("Blog", "=", true).
 		Order("-Created").
 		Limit(1)
 

@@ -83,6 +83,11 @@ var editTmpl = template.Must(template.New("edit.html").Parse(`<!DOCTYPE html>
 						<span class="helper-text">Comma-separated tag list</span>
 					</div>
 					<div class="input-field col s12">
+						<textarea name="Description">{{.Description}}</textarea>
+						<label for="Description"{{if .Description}} class="active"{{end}}>Description</label>
+						<span class="helper-text">One or two sentence summary of the page; goes into page metadata.</span>
+					</div>
+					<div class="input-field col s12">
 						<div id="editor"></div>
 						<input type="hidden" id="contents" name="Contents" value="{{.Contents}}">
 					</div>
@@ -208,6 +213,7 @@ func (s *server) handleEditPost(w http.ResponseWriter, r *http.Request) {
 	page.Key = key
 	page.Title = title
 	page.Contents = contents
+	page.Description = r.PostFormValue("Description")
 	page.Published = r.PostFormValue("Published") == "on"
 	page.Blog = r.PostFormValue("Blog") == "on"
 	page.Category = r.PostFormValue("Category")

@@ -43,6 +43,7 @@ type Page struct {
 	Blog         bool
 	Category     string
 	Tags         []string
+	Description  string         `datastore:",noindex"`
 	Contents     string         `datastore:",noindex"`
 	Prev, Next   *datastore.Key `datastore:",noindex"`
 

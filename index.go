@@ -30,6 +30,7 @@ var (
 #### {{.Header}}
 {{range .Pages}}
 *   [{{.Title}}](/{{.Key.Name}}){{if .Edited}} (edited {{.LastModified.Format "January 2006"}}){{end}}{{end}}
+	{{if .Description}}{{.Description}}{{end}}
 
 {{end}}`))
 )

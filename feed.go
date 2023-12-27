@@ -56,13 +56,14 @@ func (s *server) fetchFeed(ctx context.Context) (*feeds.Feed, error) {
 		}
 		link := s.site.URLBase + page.Key.Name
 		feed.Items = append(feed.Items, &feeds.Item{
-			Title:   page.Title,
-			Link:    &feeds.Link{Href: link},
-			Author:  author,
-			Id:      link,
-			Updated: page.LastModified,
-			Created: page.Created,
-			Content: string(blackfridayRun(page.Contents)),
+			Title:       page.Title,
+			Link:        &feeds.Link{Href: link},
+			Author:      author,
+			Id:          link,
+			Updated:     page.LastModified,
+			Created:     page.Created,
+			Content:     string(blackfridayRun(page.Contents)),
+			Description: page.Description,
 		})
 	}
 	return feed, nil
