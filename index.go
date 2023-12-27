@@ -29,8 +29,8 @@ var (
 {{range .}}
 #### {{.Header}}
 {{range .Pages}}
-*   [{{.Title}}](/{{.Key.Name}}){{if .Edited}} (edited {{.LastModified.Format "January 2006"}}){{end}}
-	{{if .Description}}{{.Description}}{{end}}{{end}}
+*   [{{.Title}}](/{{.Key.Name}}){{if .Edited}} (edited {{.LastModified.Format "January 2006"}}){{end}}{{if .Description}}
+	{{.Description}}{{end}}{{end}}
 
 {{end}}`))
 )
@@ -41,7 +41,7 @@ func (s *server) fetchIndex(ctx context.Context, _ map[string]string) (content, 
 		FilterField("Published", "=", true).
 		FilterField("Blog", "=", true).
 		Order("-Created").
-		Project("Title", "Created", "LastModified")
+		Project("Title", "Description", "Created", "LastModified")
 
 	var pages []*Page
 	if _, err := s.client.GetAll(ctx, q, &pages); err != nil {
@@ -51,10 +51,11 @@ func (s *server) fetchIndex(ctx context.Context, _ map[string]string) (content, 
 		return sitePage{
 			site: s.site,
 			page: &Page{
-				Key:       datastore.NameKey("Page", "index", s.site.Key),
-				Title:     "Index",
-				Published: true,
-				Contents:  "No posts yet!",
+				Key:         datastore.NameKey("Page", "index", s.site.Key),
+				Title:       "Index",
+				Published:   true,
+				Contents:    "No posts yet!",
+				Description: "List of all blog posts, in reverse chronological order.",
 			},
 		}, nil
 	}
