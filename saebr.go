@@ -13,7 +13,7 @@
 // limitations under the License.
 
 // Package saebr provides a simple blog or CMS for running on App Engine.
-package saebr // import "github.com/DrJosh9000/saebr"
+package saebr // import "drjosh.dev/saebr"
 
 import (
 	"context"
